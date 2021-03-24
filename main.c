@@ -5,11 +5,13 @@
 
 #define MAX_PROCESSORS 1024
 
+void simulateProcessor(char *fileName, int processorCount);
+
 int main (int argc, char **argv) {
 
     // Process command line arguments
     // int cflag = 0;
-    // char *fvalue;
+    char *fvalue;
     int pvalue;
     int index;
     int c;
@@ -21,7 +23,7 @@ int main (int argc, char **argv) {
         switch (c)
             {
             case 'f':
-                // fvalue = optarg;
+                fvalue = optarg;
                 break;
             case 'p':
                 pvalue = atoi(optarg);
@@ -49,6 +51,12 @@ int main (int argc, char **argv) {
 
     for (index = optind; index < argc; index++)
         printf ("Non-option argument %s\n", argv[index]);
+
+    simulateProcessor(fvalue, pvalue);
         
     return 0;
+}
+
+void simulateProcessor(char *fileName, int processorCount) {
+    return;
 }
