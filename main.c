@@ -1,3 +1,5 @@
+#include "list.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +8,7 @@
 #define MAX_PROCESSORS 1024
 
 void simulateProcessor(char *fileName, int processorCount);
+List *parseFile(char *fileName);
 
 int main (int argc, char **argv) {
 
@@ -58,5 +61,30 @@ int main (int argc, char **argv) {
 }
 
 void simulateProcessor(char *fileName, int processorCount) {
+    List *processList = parseFile(fileName);
+    printList(processList);
     return;
+}
+
+List *parseFile(char *fileName) {
+    FILE *file = fopen(fileName, "r");
+
+    if (file == NULL) {
+        printf("File: %s does not exist.", fileName);
+        exit(1);
+    }
+
+    // struct data listData;
+    List *list = newList();
+
+    int timeArrived;
+    int processId;
+    int executionTime;
+    char parallelisableChar;
+    while (fscanf(file, "%d %d %d %c", &timeArrived, &processId, &executionTime, &parallelisableChar) == 4) {
+        struct data listData = {timeArrived, processId, executionTime, false, false, -1};
+        listAppend(list, listData);
+    }
+
+    return list;
 }

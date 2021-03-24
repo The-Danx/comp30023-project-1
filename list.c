@@ -72,3 +72,16 @@ Data listPop(List *list) {
     free(oldHead);
     return data;
 }
+
+void printList(List *list) {
+    struct data listData;
+    if (list->size > 0) {
+        Node *node = list->head;
+        while (node != NULL) {
+            listData = node->data;
+            printf("%d %d %d %d %d %d\n", listData.timeArrived, listData.processId, listData.executionTime, listData.parallelisable, listData.complete, listData.waitingTime);
+            node = node->next;
+        }
+    }
+    return;
+}

@@ -41,4 +41,6 @@ void listAppend(List *list, Data data);
 
 Data listPop(List *list);
 
+void printList(List *list);
+
 #endif
