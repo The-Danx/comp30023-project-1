@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-List *newList() {
+List *newList()
+{
     List *list = malloc(sizeof(*list));
     assert(list);
 
@@ -13,15 +14,18 @@ List *newList() {
     return list;
 }
 
-void freeList(List *list) {
-    while (list->size > 0) {
+void freeList(List *list)
+{
+    while (list->size > 0)
+    {
         listPop(list);
     }
 
     free(list);
 }
 
-Node *newNode(Data data) {
+Node *newNode(Data data)
+{
     Node *node = malloc(sizeof(*node));
     assert(node);
 
@@ -31,29 +35,36 @@ Node *newNode(Data data) {
     return node;
 }
 
-void freeNode(Node *node) {
+void freeNode(Node *node)
+{
     free(node);
 }
 
-void listAppend(List *list, Data data) {
+void listAppend(List *list, Data data)
+{
     Node *new = newNode(data);
 
-    if (list->size > 0) {
+    if (list->size > 0)
+    {
         Node *oldBottom = list->head;
-        while (oldBottom->next != NULL) {
+        while (oldBottom->next != NULL)
+        {
             oldBottom = oldBottom->next;
         }
         oldBottom->next = new;
     }
-    else {
+    else
+    {
         list->head = new;
     }
 
     list->size++;
 }
 
-Data listPop(List *list) {
-    if (list->size == 0) {
+Data listPop(List *list)
+{
+    if (list->size == 0)
+    {
         printf("Can't pop from empty list.");
         exit(1);
     }
@@ -61,10 +72,12 @@ Data listPop(List *list) {
     Node *oldHead = list->head;
     Data data = oldHead->data;
 
-    if (list-> size == 1) {
+    if (list->size == 1)
+    {
         list->head = NULL;
     }
-    else {
+    else
+    {
         list->head = oldHead->next;
     }
 
@@ -73,13 +86,16 @@ Data listPop(List *list) {
     return data;
 }
 
-void printList(List *list) {
+void printList(List *list)
+{
     struct data listData;
-    if (list->size > 0) {
+    if (list->size > 0)
+    {
         Node *node = list->head;
-        while (node != NULL) {
+        while (node != NULL)
+        {
             listData = node->data;
-            printf("%d %d %d %d %d %d\n", listData.timeArrived, listData.processId, listData.executionTime, listData.parallelisable, listData.complete, listData.waitingTime);
+            printf("%d %d %d %d %d %d %d\n", listData.timeArrived, listData.processId, listData.executionTime, listData.parallelisable, listData.complete, listData.waitingTime, listData.remainingTime);
             node = node->next;
         }
     }

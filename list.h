@@ -17,14 +17,17 @@ struct data
     bool parallelisable;
     bool complete;
     int waitingTime;
+    int remainingTime;
 };
 
-struct list {
+struct list
+{
     Node *head;
     int size;
 };
 
-struct node {
+struct node
+{
     Node *next;
     Data data;
 };
