@@ -10,6 +10,7 @@ List *newList()
 
     list->head = NULL;
     list->size = 0;
+    list->remainingTime = 0;
 
     return list;
 }
@@ -59,6 +60,7 @@ void listAppend(List *list, Data data)
     }
 
     list->size++;
+    list->remainingTime = list->remainingTime + new->data.executionTime;
 }
 
 Data listPop(List *list)
@@ -82,22 +84,64 @@ Data listPop(List *list)
     }
 
     list->size--;
+    list->remainingTime = list->remainingTime - oldHead->data.remainingTime;
     free(oldHead);
     return data;
 }
 
+void sortedInsert(List *list, Data data)
+{
+    Node *node = newNode(data);
+    // if (currentNode != NULL)
+    // {
+    //     printf("%d %d %d %d\n", list->size == 0, node->data.timeArrived <= currentNode->data.timeArrived, node->data.executionTime <= currentNode->data.executionTime);
+    // }
+    if (list->size == 0 || (node->data.timeArrived < list->head->data.timeArrived) || (node->data.timeArrived == list->head->data.timeArrived && node->data.executionTime < list->head->data.executionTime) || (node->data.timeArrived < list->head->data.timeArrived) || (node->data.timeArrived == list->head->data.timeArrived && node->data.executionTime == list->head->data.executionTime && node->data.processId < list->head->data.processId))
+    {
+        node->next = list->head;
+        list->head = node;
+        list->size++;
+        list->remainingTime = list->remainingTime + node->data.executionTime;
+        return;
+    }
+
+    Node *currentNode = list->head;
+    while (currentNode->next != NULL)
+    {
+        if ((node->data.timeArrived < currentNode->next->data.timeArrived) || (node->data.timeArrived == currentNode->next->data.timeArrived && node->data.executionTime < currentNode->next->data.executionTime) || (node->data.timeArrived < currentNode->next->data.timeArrived) || (node->data.timeArrived == currentNode->next->data.timeArrived && node->data.executionTime == currentNode->next->data.executionTime && node->data.processId < currentNode->next->data.processId))
+        {
+            node->next = currentNode->next;
+            currentNode->next = node;
+            list->size++;
+            list->remainingTime = list->remainingTime + node->data.executionTime;
+            return;
+        }
+        currentNode = currentNode->next;
+    }
+    node->next = currentNode->next;
+    currentNode->next = node;
+    list->size++;
+    list->remainingTime = list->remainingTime + node->data.executionTime;
+    return;
+}
+
 void printList(List *list)
 {
-    struct data listData;
     if (list->size > 0)
     {
         Node *node = list->head;
         while (node != NULL)
         {
-            listData = node->data;
-            printf("%d %d %d %d %d %d %d\n", listData.timeArrived, listData.processId, listData.executionTime, listData.parallelisable, listData.complete, listData.waitingTime, listData.remainingTime);
+            printNode(node);
             node = node->next;
         }
     }
+    return;
+}
+
+void printNode(Node *node)
+{
+    struct data listData = node->data;
+    printf("%d %d %d %d %d %d %d\n", listData.timeArrived, listData.processId, listData.executionTime, listData.parallelisable, listData.complete, listData.waitingTime, listData.remainingTime);
     return;
 }

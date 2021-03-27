@@ -24,6 +24,7 @@ struct list
 {
     Node *head;
     int size;
+    int remainingTime;
 };
 
 struct node
@@ -44,6 +45,10 @@ void listAppend(List *list, Data data);
 
 Data listPop(List *list);
 
+void sortedInsert(List *list, Data data);
+
 void printList(List *list);
+
+void printNode(Node *node);
 
 #endif
