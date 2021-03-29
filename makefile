@@ -1,7 +1,7 @@
 CFLAGS =-Wall
 
 allocate: main.o list.o
-	gcc $(CFLAGS) -o allocate main.o list.o
+	gcc $(CFLAGS) -o allocate main.o list.o -lm
 
 main.o: main.c
 	gcc $(CFLAGS) -c main.c
