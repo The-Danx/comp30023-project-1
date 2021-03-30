@@ -24,8 +24,9 @@ struct processorData
     int procFinished;
 };
 
-void simulateProcessors(char *fileName, int processorCount);
+void simulateProcessors(char *fileName, int processorCount, bool cFlag);
 struct processorData simulateProcessor(struct processorData processor, int time);
+struct processorData simulateProcessorC(struct processorData processor, int time);
 void printPerformanceStatistics(List *processList, int time);
 List *parseFile(char *fileName);
 float roundFloat(float num);
@@ -37,7 +38,7 @@ int main(int argc, char **argv)
 {
 
     // Process command line arguments
-    // int cflag = 0;
+    bool cflag = false;
     char *fvalue;
     int pvalue;
     int index;
@@ -60,7 +61,7 @@ int main(int argc, char **argv)
             }
             break;
         case 'c':
-            // cflag = 1;
+            cflag = true;
             break;
         case '?':
             if (optopt == 'c' || optopt == 'p')
@@ -81,12 +82,12 @@ int main(int argc, char **argv)
         printf("Non-option argument %s\n", argv[index]);
     }
 
-    simulateProcessors(fvalue, pvalue);
+    simulateProcessors(fvalue, pvalue, cflag);
 
     return 0;
 }
 
-void simulateProcessors(char *fileName, int processorCount)
+void simulateProcessors(char *fileName, int processorCount, bool cFlag)
 {
     // Initialise variables
     List *processList = parseFile(fileName);
@@ -165,7 +166,14 @@ void simulateProcessors(char *fileName, int processorCount)
         // Run simulation on all cores
         for (int i = 0; i < processorCount; i++)
         {
-            processorDataArray[i] = simulateProcessor(processorDataArray[i], time);
+            if (cFlag)
+            {
+                processorDataArray[i] = simulateProcessorC(processorDataArray[i], time);
+            }
+            else
+            {
+                processorDataArray[i] = simulateProcessor(processorDataArray[i], time);
+            }
         }
 
         // Check for finished processes
@@ -273,6 +281,68 @@ struct processorData simulateProcessor(struct processorData processor, int time)
             processor.minimumProcessId = node->data.processId;
             processor.processAvailable = true;
             processor.processRestart = true;
+        }
+        node = node->next;
+    }
+    if (!processor.processAvailable)
+    {
+        return processor;
+    }
+    // Update process
+    if (processor.processRestart)
+    {
+        if (ceil(processor.minimumTimeProcess->data.processId) == processor.minimumTimeProcess->data.processId && processor.minimumTimeProcess->data.parallelised)
+        {
+            printf("%d,RUNNING,pid=%.1f,remaining_time=%d,cpu=%d\n", time, processor.minimumTimeProcess->data.processId, processor.minimumTimeProcess->data.remainingTime, processor.id);
+        }
+        else
+        {
+            printf("%d,RUNNING,pid=%g,remaining_time=%d,cpu=%d\n", time, processor.minimumTimeProcess->data.processId, processor.minimumTimeProcess->data.remainingTime, processor.id);
+        }
+        processor.processRestart = false;
+    }
+
+    // Update processor
+    processor.minimumTimeProcess->data.remainingTime--;
+    processor.processList->remainingTime--;
+    processor.minimumTime = processor.minimumTimeProcess->data.remainingTime;
+
+    // Update if process is finished
+    if (processor.minimumTime == 0)
+    {
+        processor.procRemaining--;
+        globalProcRemaining--;
+        if (!processor.minimumTimeProcess->data.parallelised)
+        {
+            processor.procFinished = processor.minimumTimeProcess->data.processId;
+            currentProcRemaining--;
+        }
+        processor.minimumTime = INT_MAX;
+        processor.minimumProcessId = INT_MAX;
+        processor.minimumTimeProcess->data.complete = true;
+        processor.minimumTimeProcess->data.exitTime = time + 1;
+        processor.processAvailable = false;
+        processor.minimumTimeProcess->data.waitingTime = time + 1 - processor.minimumTimeProcess->data.timeArrived - processor.minimumTimeProcess->data.executionTime;
+        processor.processRestart = true;
+    }
+
+    return processor;
+}
+
+struct processorData simulateProcessorC(struct processorData processor, int time)
+{
+    // Find the minimum time process
+    Node *node = processor.processList->head;
+    while (node != NULL)
+    {
+        if (!node->data.complete)
+        {
+            processor.minimumTimeProcess = node;
+            processor.minimumTime = node->data.remainingTime;
+            processor.minimumProcessId = node->data.processId;
+            processor.processAvailable = true;
+            processor.processRestart = true;
+            break;
         }
         node = node->next;
     }
