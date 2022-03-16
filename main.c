@@ -433,10 +433,10 @@ void printPerformanceStatistics(List *processList, int time)
 
 List *parseFile(char *fileName)
 {
-    if (fileName[0] == '/')
-    {
-        fileName = fileName + 1;
-    }
+    // if (fileName[0] == '/')
+    // {
+    //     fileName = fileName + 1;
+    // }
 
     FILE *file = fopen(fileName, "r");
 
